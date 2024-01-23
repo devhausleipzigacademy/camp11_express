@@ -1,0 +1,28 @@
+GET http://localhost:8080/  HTTP/1.1
+
+###
+
+GET http://localhost:8080/blog HTTP/1.1
+
+
+### 
+POST http://localhost:8080/blog HTTP/1.1
+Content-Type: application/json
+
+{
+    "title": "hello world",
+    "content": "blablalba blablaba"
+}
+
+###
+PATCH http://localhost:8080/blog/1 HTTP/1.1
+Content-Type: application/json
+
+{
+    "title": "Updated title",
+    "content": "updated content"
+}
+
+###
+DELETE http://localhost:8080/blog/1 HTTP/1.1
+Content-Type: application/json
