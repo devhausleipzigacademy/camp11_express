@@ -7,6 +7,7 @@ import {
   getBlogPost,
   updateBlogPost,
 } from "./controllers/blog.controllers";
+import { createComment } from "./controllers/comment.controllers";
 
 const PORT = process.env.PORT;
 const app = express();
@@ -33,6 +34,8 @@ app.post("/blog", blogValidation, createBlogPost);
 app.patch("/blog/:blogId", blogValidation, updateBlogPost);
 
 app.delete("/blog/:blogId", deleteBlogPost);
+
+app.post("/comment/:blogId", createComment);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
 
 type Blog = {
   id: number;
@@ -7,89 +8,123 @@ type Blog = {
 };
 
 let DUMMY_BLOGS: Blog[] = [];
+const prisma = new PrismaClient();
 
-export const getBlogPost = (
+export const getBlogPost = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  if (DUMMY_BLOGS.length === 0) {
+  const posts = await prisma.blogPost.findMany({
+    orderBy: {
+      title: "asc",
+    },
+    include: {
+      comments: true,
+    },
+  });
+
+  if (!posts || posts.length === 0) {
     return res.status(404).json({
       message: "No blogs found",
     });
   }
 
-  res.json({
-    blogs: DUMMY_BLOGS,
+  return res.json({
+    message: "All blogs",
+    posts,
   });
 };
 
-export const createBlogPost = (
+export const createBlogPost = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { title, content } = req.body;
+  try {
+    const { title, content } = req.body;
 
-  DUMMY_BLOGS.push({
-    id: DUMMY_BLOGS.length + 1,
-    title,
-    content,
-  });
-
-  res.status(201).json({
-    message: "Blog created successfully",
-  });
-};
-
-export const updateBlogPost = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { blogId } = req.params;
-  const { title, content } = req.body;
-
-  const foundBlog = DUMMY_BLOGS.find((blog) => blog.id === +blogId);
-  if (!foundBlog) {
-    return res.status(404).json({
-      message: "blog not found",
-    });
-  }
-
-  DUMMY_BLOGS = DUMMY_BLOGS.map((blog) => {
-    if (blog.id === +blogId) {
-      return {
-        ...blog,
+    const createdBlog = await prisma.blogPost.create({
+      data: {
         title,
         content,
-      };
-    }
-    return blog;
-  });
+      },
+    });
 
-  res.json({
-    updatedBlogs: DUMMY_BLOGS,
-  });
+    res.status(201).json({
+      message: "Blog created successfully",
+      blog: createdBlog,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
 };
 
-export const deleteBlogPost = (
+export const updateBlogPost = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const { blogId } = req.params;
-  const foundBlog = DUMMY_BLOGS.find((blog) => blog.id === +blogId);
+  const { title, content } = req.body;
+
+  const foundBlog = await prisma.blogPost.findUnique({
+    where: {
+      id: blogId,
+    },
+  });
 
   if (!foundBlog) {
     return res.status(404).json({
-      message: "blog not found",
+      message: "Blog not found",
     });
   }
 
-  DUMMY_BLOGS = DUMMY_BLOGS.filter((blog) => blog.id !== +blogId);
+  const updatedPost = await prisma.blogPost.update({
+    data: {
+      title,
+      content,
+    },
+    where: {
+      id: blogId,
+    },
+  });
+
+  res.json({
+    message: "Blog updated successfully",
+    updatedPost,
+  });
+};
+
+export const deleteBlogPost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { blogId } = req.params;
+  const foundBlog = await prisma.blogPost.findUnique({
+    where: {
+      id: blogId,
+    },
+  });
+
+  if (!foundBlog) {
+    return res.status(404).json({
+      message: "Blog not found",
+    });
+  }
+
+  const deletedPost = await prisma.blogPost.delete({
+    where: {
+      id: blogId,
+    },
+  });
 
   res.json({
     message: "blog deleted successfully",
+    deletedPost,
   });
 };

@@ -10,12 +10,12 @@ POST http://localhost:8080/blog HTTP/1.1
 Content-Type: application/json
 
 {
-    "title": "hello world",
-    "content": "blablalba blablaba"
+    "title": "A second post",
+    "content": "hello"
 }
 
 ###
-PATCH http://localhost:8080/blog/1 HTTP/1.1
+PATCH http://localhost:8080/blog/47e36f2f-91b5-4d7f-9904-5e93a5b8fdfb HTTP/1.1
 Content-Type: application/json
 
 {
@@ -24,5 +24,14 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:8080/blog/1 HTTP/1.1
+DELETE http://localhost:8080/blog/47e36f2f-91b5-4d7f-9904-5e93a5b8fdfb HTTP/1.1
 Content-Type: application/json
+
+
+###
+POST http://localhost:8080/comment/65627e54-dc1d-49a3-a8b0-f0eddb92827a HTTP/1.1
+Content-Type: application/json
+
+{
+    "content": "create new comment"
+}
