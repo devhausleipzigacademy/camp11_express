@@ -10,8 +10,8 @@ POST http://localhost:8080/blog HTTP/1.1
 Content-Type: application/json
 
 {
-    "title": "A second post",
-    "content": "hello"
+    "title": "A",
+    "content": "hello blablala"
 }
 
 ###
